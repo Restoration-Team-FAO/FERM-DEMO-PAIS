@@ -1,0 +1,7 @@
+{
+  "id": "external_id",
+  "nombre_proyecto": "title",
+  "area_ha": "area_ha",
+  "tipo_actividad": "activity_type",
+  "geometry": "geometry"
+}

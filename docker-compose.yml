@@ -1,0 +1,46 @@
+version: "3.9"
+name: ferm-demo
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: fermdemo-postgres
+    environment:
+      POSTGRES_DB: icf_restauracion
+      POSTGRES_USER: icf_user
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/00_init.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U icf_user -d icf_restauracion"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
+  mock-ferm:
+    build: ./mock-ferm
+    container_name: fermdemo-mock
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
+  icf-client:
+    build: ./icf-client
+    container_name: fermdemo-client
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mock-ferm:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
