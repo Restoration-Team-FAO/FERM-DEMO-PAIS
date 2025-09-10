@@ -32,6 +32,6 @@ SELECT
   tipologia_ecosistemas,
   actividad,
   indicadores_aurora,
-  ST_AsGeoJSON(geom) AS geom
+  ST_AsGeoJSON(ST_Transform(geom, 4326)) AS geom
 FROM pnr.ferm_query
 LIMIT 50;
