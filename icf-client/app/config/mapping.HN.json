@@ -1,0 +1,56 @@
+{
+  "schema_version": "ferm-v1",
+  "source": { "schema": "pnr", "relation": "ferm_query" },
+
+  "direct": {
+    "id": "external_id",
+    "titulo": "title",
+    "descripcion": "description",
+    "pais": "country_code",
+
+    "estado_restauracion": "restoration_status",
+    "tipo_resstauracion": "restoration_type",
+
+    "departamento": "admin.department",
+    "municipio": "admin.municipality",
+    "nombre_sitio": "admin.site_name",
+
+    "unidad": "area_unit",
+
+    "actividad_plantacion": "planting_activity",
+    "sistema_plantacion": "planting_system",
+    "disenio_arreglo": "design_layout",
+    "opciones_foresteria": "forestry_options",
+
+    "tenencia": "tenure",
+    "ods": "sdg",
+    "documento_iniciativa": "initiative_document",
+    "nombre_responsable": "responsible_name",
+    "informacion_contacto": "contact_info",
+    "palabras_clave": "keywords",
+    "tipo_org": "org_type",
+    "sitio_web": "website",
+    "zip_foto": "photo_zip",
+    "planes_restauracion": "restoration_plans",
+    "tipologia_ecosistemas": "ecosystem_typology",
+    "actividad": "activity",
+    "indicadores_aurora": "aurora_indicators",
+
+    "geom": "geometry"
+  },
+
+  "transforms": {
+    "anio_inicio":       { "to": "year_start",      "fn": "to_int"   },
+    "anio_finalizacion": { "to": "year_end",        "fn": "to_int"   },
+    "area_comprometida": { "to": "area_committed",  "fn": "to_float" },
+    "area_total":        { "to": "area_total",      "fn": "to_float" },
+    "geom":              { "to": "geometry",        "fn": "to_geojson" }
+  },
+
+  "fallbacks": {
+    "external_id": ["id", "cod_proye"],
+    "country_code": ["pais", "@ENV.COUNTRY_CODE"]
+  },
+
+  "required_min": ["external_id", "title", "country_code", "geometry"]
+}
