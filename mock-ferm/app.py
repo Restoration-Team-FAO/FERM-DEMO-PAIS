@@ -1,22 +1,31 @@
 from fastapi import FastAPI, Request, status
-from pydantic import BaseModel, Field
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from uuid import uuid4
 
 app = FastAPI(title="FERM Mock API", version="0.1.0")
 
-class Geometry(BaseModel):
-    type: str
-    coordinates: list
+# Habilitar CORS (opcional, útil para pruebas desde navegador)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Project(BaseModel):
+    # 👉 Esto permite aceptar campos extra sin fallar
+    model_config = ConfigDict(extra='allow')
+
     external_id: Optional[str] = None
-    title: str = Field(..., min_length=2)
+    title: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = None
     area_ha: Optional[float] = None
     activity_type: Optional[str] = None
     status: Optional[str] = "en_ejecucion"
-    geometry: Optional[Geometry] = None
+    geometry: Optional[dict] = None
     country_code: Optional[str] = None
 
 DB = {}
