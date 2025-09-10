@@ -17,19 +17,35 @@ def set_nested(d: dict, dotted_path: str, value):
 def apply_mapping(row: dict, mapping: dict) -> dict:
     out = {}
 
-    # 1) direct (renombre 1:1 y/o campos anidados)
+    # DIRECT: copias 1:1 (pueden ser nested con 'a.b.c')
     for src, dst in mapping.get("direct", {}).items():
-        if src in row:
+        if src in row and row[src] not in (None, ""):
             set_nested(out, dst, row[src])
 
-    # 2) transforms (aplica funciones registradas)
-    for src, spec in mapping.get("transforms", {}).items():
-        to = spec["to"]
-        fn = TRANSFORMS[spec["fn"]]
-        val = row.get(src, None)
-        set_nested(out, to, fn(val))
+    # DERIVED: con funciones de 'transforms'
+    for src, rule in mapping.get("derived", {}).items():
+        fn_name = rule.get("fn")
+        dst = rule.get("to")
+        if fn_name and dst:
+            fn = TRANSFORMS.get(fn_name)
+            if fn:
+                val = fn(row.get(src))
+                if val not in (None, ""):
+                    set_nested(out, dst, val)
 
-    # 3) fallbacks (primer valor disponible; soporta @ENV.X)
+    # COMPUTED: valores que nacen sólo de funciones (sin src)
+    for rule in mapping.get("computed", []):
+        fn_name = rule.get("fn")
+        dst = rule.get("to")
+        arg = rule.get("arg")
+        if fn_name and dst:
+            fn = TRANSFORMS.get(fn_name)
+            if fn:
+                val = fn(arg)
+                if val not in (None, ""):
+                    set_nested(out, dst, val)
+
+    # FALLBACKS: toma el primero que exista (incluye @ENV.*)
     for dst, sources in mapping.get("fallbacks", {}).items():
         value = None
         for src in sources:
@@ -43,4 +59,9 @@ def apply_mapping(row: dict, mapping: dict) -> dict:
         if value not in (None, ""):
             set_nested(out, dst, value)
 
+    # 🔧 Normalizaciones finales para cumplir el esquema FERM
+    if out.get('external_id') is not None and not isinstance(out['external_id'], str):
+        out['external_id'] = str(out['external_id'])
+
     return out
+
