@@ -15,11 +15,11 @@ PG_CONN = {
 }
 API_BASE = os.getenv("FERM_API_BASE")
 API_KEY  = os.getenv("FERM_API_KEY")
-COUNTRY  = os.getenv("COUNTRY_CODE", "HN")
+CONFIG_NAME = os.getenv("CONFIG_NAME", "HN")
 
-CONFIG_NAME = os.getenv("CONFIG_NAME", "HN")  # permite elegir país: HN, GT, etc.
-MAPPING_PATH = os.path.join(os.path.dirname(__file__), "config", f"mapping.{CONFIG_NAME}.json")
-SQL_PATH     = os.path.join(os.path.dirname(__file__), "config", f"sql.{CONFIG_NAME}.sql")
+BASE_DIR = os.path.dirname(__file__)
+MAPPING_PATH = os.path.join(BASE_DIR, "config", f"mapping.{CONFIG_NAME}.json")
+SQL_PATH     = os.path.join(BASE_DIR, "config", f"sql.{CONFIG_NAME}.sql")
 
 def headers():
     h = {"Content-Type": "application/json", "Accept": "application/json"}
@@ -42,7 +42,7 @@ def load_mapping():
         return json.load(f)
 
 def validate(payload: dict) -> FermProject:
-    return FermProject(**payload)
+    return FermProject(**payload)  # Pydantic v2
 
 def post_one(payload: dict):
     url = f"{API_BASE}/projects"
@@ -59,7 +59,7 @@ def main():
     for row in rows:
         payload_raw = apply_mapping(row, mapping)
         try:
-            payload = validate(payload_raw).model_dump()  # v2
+            payload = validate(payload_raw).model_dump()  # v2: dict limpio
         except Exception as e:
             print("❌ Error de validación:", e, "payload:", payload_raw)
             continue
@@ -69,4 +69,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
