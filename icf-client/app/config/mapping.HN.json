@@ -3,10 +3,8 @@
   "source": { "schema": "pnr", "relation": "ferm_query" },
 
   "direct": {
-    "id": "external_id",
     "titulo": "title",
     "descripcion": "description",
-    "pais": "country_code",
 
     "estado_restauracion": "restoration_status",
     "tipo_resstauracion": "restoration_type",
@@ -34,17 +32,22 @@
     "planes_restauracion": "restoration_plans",
     "tipologia_ecosistemas": "ecosystem_typology",
     "actividad": "activity",
-    "indicadores_aurora": "aurora_indicators",
-
-    "geom": "geometry"
+    "indicadores_aurora": "aurora_indicators"
   },
 
   "transforms": {
-    "anio_inicio":       { "to": "year_start",      "fn": "to_int"   },
-    "anio_finalizacion": { "to": "year_end",        "fn": "to_int"   },
-    "area_comprometida": { "to": "area_committed",  "fn": "to_float" },
-    "area_total":        { "to": "area_total",      "fn": "to_float" },
-    "geom":              { "to": "geometry",        "fn": "to_geojson" }
+    "id":                 { "to": "external_id",     "fn": "to_str" },
+    "cod_proye":          { "to": "external_id",     "fn": "to_str" },
+
+    "anio_inicio":        { "to": "year_start",      "fn": "to_int" },
+    "anio_finalizacion":  { "to": "year_end",        "fn": "to_int" },
+
+    "area_comprometida":  { "to": "area_committed",  "fn": "to_float" },
+    "area_total":         { "to": "area_total",      "fn": "to_float" },
+
+    "pais":               { "to": "country_code",    "fn": "country_alpha2" },
+
+    "geom":               { "to": "geometry",        "fn": "to_geojson" }
   },
 
   "fallbacks": {
