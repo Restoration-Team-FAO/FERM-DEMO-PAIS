@@ -1,16 +1,17 @@
-from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, Dict, Any
+from pydantic import BaseModel, ConfigDict
 
 class FermProject(BaseModel):
-    model_config = ConfigDict(extra="allow")  # aceptamos campos adicionales
+    # aceptamos campos adicionales que no estén listados
+    model_config = ConfigDict(extra="allow")
 
-    # Mínimos indispensables:
+    # mínimos indispensables
     external_id: str
     title: str
     country_code: str
     geometry: Dict[str, Any]
 
-    # Recomendados/útiles:
+    # recomendados
     year_start: Optional[int] = None
     year_end: Optional[int] = None
     restoration_status: Optional[str] = None
@@ -20,5 +21,4 @@ class FermProject(BaseModel):
     area_total: Optional[float] = None
     area_unit: Optional[str] = None
 
-    # Objetos anidados
     admin: Optional[Dict[str, Any]] = None
